@@ -38,14 +38,14 @@ class Encoder(nn.Module):
         self.conv = []
         self.conv.append(Conv2d(image_channels, 16, 3, 1, 1))
         for i in range(num_layer):
-            num_channel = 2 ** min((4 + i), 9)
-            self.conv.append(Conv2d(num_channel, num_channel * 2, 3, 2, 1))
+            num_channels = 2 ** min((4 + i), 9)
+            self.conv.append(Conv2d(num_channels, num_channels * 2, 3, 2, 1))
 
         self.conv = nn.Sequential(*self.conv)
 
-        num_channel = 2 ** min((4 + num_layer), 9)
-        self.fc_mean = nn.Linear(down_size ** 2 * num_channel, latent_dim)
-        self.fc_logvar = nn.Linear(down_size ** 2 * num_channel, latent_dim)
+        num_channels = 2 ** min((4 + num_layer), 9)
+        self.fc_mean = nn.Linear(down_size ** 2 * num_channels, latent_dim)
+        self.fc_logvar = nn.Linear(down_size ** 2 * num_channels, latent_dim)
 
     def forward(self, x):
         out = self.conv(x)
@@ -63,13 +63,13 @@ class Decoder(nn.Module):
         self.down_size = 4
         num_layer = int(math.log2(image_size) - math.log2(self.down_size))
 
-        self.base_channel = 2 ** min((4 + num_layer), 9)
-        self.fc = nn.Linear(latent_dim, self.down_size ** 2 * self.base_channel)
+        self.base_channels = 2 ** min((4 + num_layer), 9)
+        self.fc = nn.Linear(latent_dim, self.down_size ** 2 * self.base_channels)
 
         self.conv = []
         for i in reversed(range(num_layer)):
-            num_channel = 2 ** min((4 + i), 9)
-            self.conv.append(ConvTranspose2d(num_channel * 2, num_channel, 4, 2, 1))
+            num_channels = 2 ** min((4 + i), 9)
+            self.conv.append(ConvTranspose2d(num_channels * 2, num_channels, 4, 2, 1))
         self.conv.append(nn.Conv2d(16, image_channels, 3, 1, 1))
         self.conv = nn.Sequential(*self.conv)
 
@@ -78,7 +78,7 @@ class Decoder(nn.Module):
 
     def forward(self, x):
         out = self.relu(self.fc(x))
-        out = out.view(x.size(0), self.base_channel, self.down_size, self.down_size)
+        out = out.view(x.size(0), self.base_channels, self.down_size, self.down_size)
         out = self.sigmoid(self.conv(out))
 
         return out
