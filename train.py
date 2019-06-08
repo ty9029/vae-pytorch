@@ -26,7 +26,7 @@ class Loss(nn.Module):
 def train(model, opt):
     optimizer = Adam(model.parameters(), lr=0.001)
     criterion = Loss()
-    train_dataset = get_dataset(opt.dataset, opt.data_root, opt.image_size, train=True)
+    train_dataset = get_dataset(opt.data_name, opt.data_root, opt.image_size, train=True)
     train_loader = DataLoader(train_dataset, batch_size=opt.batch_size, shuffle=True)
 
     model.train()
@@ -43,7 +43,7 @@ def train(model, opt):
 
 
 def eval_encoder(file_name, model, opt):
-    eval_dataset = get_dataset(opt.dataset, opt.data_root, opt.image_size, train=False)
+    eval_dataset = get_dataset(opt.data_name, opt.data_root, opt.image_size, train=False)
     eval_loader = DataLoader(eval_dataset, batch_size=1, shuffle=False)
 
     zs, labels = [], []
@@ -87,7 +87,7 @@ def main():
     parser.add_argument("--batch_size", type=int, default=32)
     parser.add_argument("--device", type=str, default="cuda")
     parser.add_argument("--data_root", type=str, default="./data")
-    parser.add_argument("--dataset", type=str, default="kmnist")
+    parser.add_argument("--data_name", type=str, default="mnist")
     parser.add_argument("--image_size", type=int, default=32)
     parser.add_argument("--image_channels", type=int, default=1)
     parser.add_argument("--latent_dim", type=int, default=2)
