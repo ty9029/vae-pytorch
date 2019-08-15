@@ -91,17 +91,17 @@ class VAE(nn.Module):
         self.decoder = Decoder(image_size, image_channels, latent_dim)
         self.device = device
 
-    def reparameterize(self, mu, logvar):
-        std = logvar.mul(0.5).exp_()
+    def reparameterize(self, mu, sigma):
+        std = sigma.mul(0.5).exp_()
         esp = torch.randn(*mu.size()).to(self.device)
         z = mu + std * esp
         return z
 
     def forward(self, x):
-        mean, sigma = self.encoder(x)
-        z = self.reparameterize(mean, sigma)
+        mean, logvar = self.encoder(x)
+        z = self.reparameterize(mean, logvar)
         out = self.decoder(z)
 
-        return out, mean, sigma
+        return out, mean, logvar
 
 
